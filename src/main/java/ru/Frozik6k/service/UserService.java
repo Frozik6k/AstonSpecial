@@ -1,6 +1,7 @@
 package ru.Frozik6k.service;
 
 import ru.Frozik6k.dao.UserDao;
+import ru.Frozik6k.dto.UserDto;
 import ru.Frozik6k.model.User;
 
 import java.util.List;
@@ -31,17 +32,18 @@ public class UserService {
         System.out.println("Создан пользователь с ID = " + id);
     }
 
-    public User getUser() {
+    public UserDto getUser() {
         System.out.print("ID пользователя: ");
         Long id = Long.parseLong(scanner.nextLine());
         Optional<User> opt = userDao.findById(id);
-        System.out.println(opt.map(User::toString).orElse("Пользователь не найден"));
-        User user = opt.get();
-        return user;
+        System.out.println(opt.map(user -> new UserDto(user).toString()).orElse("Пользователь не найден"));
+        UserDto userDto = new UserDto(opt.get());
+        return userDto;
     }
 
-    public List<User> getUsers() {
-        List<User> users = userDao.findAll();
+    public List<UserDto> getUsers() {
+        List<UserDto> users = userDao.findAll().stream().map(UserDto::new).toList();
+
         if (users.isEmpty()) {
             System.out.println("Список пуст.");
         } else {
@@ -50,7 +52,7 @@ public class UserService {
         return users;
     }
 
-    public User editUser() {
+    public UserDto editUser() {
         System.out.print("ID пользователя для обновления: ");
         Long id = Long.parseLong(scanner.nextLine());
         Optional<User> opt = userDao.findById(id);
@@ -74,7 +76,7 @@ public class UserService {
 
         userDao.update(user);
         System.out.println("Пользователь обновлён.");
-        return user;
+        return new UserDto(user);
     }
 
     public void deleteUser() {
