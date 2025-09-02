@@ -23,10 +23,10 @@ public class UserDaoImpl implements UserDao {
             tx.commit();
             log.info("Created user id={}", id);
             return id;
-        } catch (HibernateException e) {
+        } catch (HibernateException exception) {
             if (tx != null) tx.rollback();
-            log.error("Error creating user", e);
-            throw e;
+            log.error("Error creating user", exception);
+            throw exception;
         }
     }
 
@@ -35,9 +35,9 @@ public class UserDaoImpl implements UserDao {
         try (Session session = HibernateUtility.getSessionFactory().openSession()) {
             User user = session.get(User.class, id);
             return Optional.ofNullable(user);
-        } catch (HibernateException e) {
-            log.error("Error fetching user id={}", id, e);
-            throw e;
+        } catch (HibernateException exception) {
+            log.error("Error fetching user id={}", id, exception);
+            throw exception;
         }
     }
 
@@ -45,9 +45,9 @@ public class UserDaoImpl implements UserDao {
     public List<User> findAll() {
         try (Session session = HibernateUtility.getSessionFactory().openSession()) {
             return session.createQuery("from User", User.class).list();
-        } catch (HibernateException e) {
-            log.error("Error fetching all users", e);
-            throw e;
+        } catch (HibernateException exception) {
+            log.error("Error fetching all users", exception);
+            throw exception;
         }
     }
 
@@ -59,10 +59,10 @@ public class UserDaoImpl implements UserDao {
             session.merge(user);
             tx.commit();
             log.info("Updated user id={}", user.getId());
-        } catch (HibernateException e) {
+        } catch (HibernateException exception) {
             if (tx != null) tx.rollback();
-            log.error("Error updating user id={}", user.getId(), e);
-            throw e;
+            log.error("Error updating user id={}", user.getId(), exception);
+            throw exception;
         }
     }
 
@@ -79,10 +79,10 @@ public class UserDaoImpl implements UserDao {
                 log.warn("User id={} not found, nothing to delete", id);
             }
             tx.commit();
-        } catch (HibernateException e) {
+        } catch (HibernateException exception) {
             if (tx != null) tx.rollback();
-            log.error("Error deleting user id={}", id, e);
-            throw e;
+            log.error("Error deleting user id={}", id, exception);
+            throw exception;
         }
     }
 }

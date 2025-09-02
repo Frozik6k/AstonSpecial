@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.Frozik6k.dao.UserDao;
 import ru.Frozik6k.dao.UserDaoImpl;
-import ru.Frozik6k.service.UserService;
+import ru.Frozik6k.mapper.UserMapper;
+import ru.Frozik6k.mapper.UserMapperImpl;
+import ru.Frozik6k.controller.UserController;
 import ru.Frozik6k.utility.HibernateUtility;
 
 import java.util.Scanner;
@@ -16,8 +18,9 @@ public class Main {
         log.info("User Service started");
         UserDao userDao = new UserDaoImpl();
         Scanner scanner = new Scanner(System.in);
+        UserMapper userMapper = new UserMapperImpl();
 
-        UserService userService = new UserService(userDao, scanner);
+        UserController userService = new UserController(userDao, scanner, userMapper);
 
         boolean running = true;
         while (running) {
@@ -44,8 +47,6 @@ public class Main {
         HibernateUtility.shutdown();
         System.out.println("Пока!");
         log.info("User Service stopped");
-
-
     }
 
     private static void printMenu() {

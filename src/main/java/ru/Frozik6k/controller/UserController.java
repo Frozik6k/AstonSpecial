@@ -1,24 +1,26 @@
-package ru.Frozik6k.service;
+package ru.Frozik6k.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.Frozik6k.dao.UserDao;
-import ru.Frozik6k.dao.UserDaoImpl;
 import ru.Frozik6k.dto.UserDto;
+import ru.Frozik6k.mapper.UserMapper;
 import ru.Frozik6k.model.User;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class UserService {
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserDao userDao;
     private final Scanner scanner;
+    private final UserMapper userMapper;
 
-    public UserService(UserDao userDao, Scanner scanner) {
+    public UserController(UserDao userDao, Scanner scanner, UserMapper userMapper) {
         this.userDao = userDao;
         this.scanner = scanner;
+        this.userMapper = userMapper;
     }
 
     public void create() {
@@ -40,13 +42,12 @@ public class UserService {
         System.out.print("ID пользователя: ");
         Long id = Long.parseLong(scanner.nextLine());
         Optional<User> opt = userDao.findById(id);
-        System.out.println(opt.map(user -> new UserDto(user).toString()).orElse("Пользователь не найден"));
-        UserDto userDto = new UserDto(opt.get());
-        return userDto;
+        System.out.println(opt.map(user -> userMapper.toDto(user).toString()).orElse("Пользователь не найден"));
+        return userMapper.toDto(opt.get());
     }
 
     public List<UserDto> readUsers() {
-        List<UserDto> users = userDao.findAll().stream().map(UserDto::new).toList();
+        List<UserDto> users = userDao.findAll().stream().map(userMapper::toDto).toList();
 
         if (users.isEmpty()) {
             System.out.println("Список пуст.");
@@ -80,7 +81,7 @@ public class UserService {
 
         userDao.update(user);
         System.out.println("Пользователь обновлён.");
-        return new UserDto(user);
+        return userMapper.toDto(user);
     }
 
     public void delete() {
