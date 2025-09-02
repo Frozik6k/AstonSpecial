@@ -4,16 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.Frozik6k.dao.UserDao;
 import ru.Frozik6k.dao.UserDaoImpl;
-import ru.Frozik6k.model.User;
 import ru.Frozik6k.service.UserService;
 import ru.Frozik6k.utility.HibernateUtility;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         log.info("User Service started");
         UserDao userDao = new UserDaoImpl();
