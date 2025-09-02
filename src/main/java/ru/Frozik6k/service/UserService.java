@@ -21,7 +21,7 @@ public class UserService {
         this.scanner = scanner;
     }
 
-    public void addUser() {
+    public void create() {
         System.out.print("Имя: ");
         String name = scanner.nextLine().trim();
         System.out.println("Email: ");
@@ -36,7 +36,7 @@ public class UserService {
         System.out.println("Создан пользователь с ID = " + id);
     }
 
-    public UserDto getUser() {
+    public UserDto read() {
         System.out.print("ID пользователя: ");
         Long id = Long.parseLong(scanner.nextLine());
         Optional<User> opt = userDao.findById(id);
@@ -45,7 +45,7 @@ public class UserService {
         return userDto;
     }
 
-    public List<UserDto> getUsers() {
+    public List<UserDto> readUsers() {
         List<UserDto> users = userDao.findAll().stream().map(UserDto::new).toList();
 
         if (users.isEmpty()) {
@@ -56,7 +56,7 @@ public class UserService {
         return users;
     }
 
-    public UserDto editUser() {
+    public UserDto update() {
         System.out.print("ID пользователя для обновления: ");
         Long id = Long.parseLong(scanner.nextLine());
         Optional<User> opt = userDao.findById(id);
@@ -83,7 +83,7 @@ public class UserService {
         return new UserDto(user);
     }
 
-    public void deleteUser() {
+    public void delete() {
         System.out.print("ID пользователя для удаления: ");
         Long id = Long.parseLong(scanner.nextLine());
         userDao.deleteById(id);

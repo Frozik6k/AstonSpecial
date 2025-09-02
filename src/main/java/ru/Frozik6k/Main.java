@@ -26,11 +26,11 @@ public class Main {
             String choice = scanner.nextLine();
             try {
                 switch (choice) {
-                    case "1" -> userService.addUser();
-                    case "2" -> userService.getUser();
-                    case "3" -> userService.getUsers();
-                    case "4" -> userService.editUser();
-                    case "5" -> userService.deleteUser();
+                    case "1" -> userService.create();
+                    case "2" -> userService.read();
+                    case "3" -> userService.readUsers();
+                    case "4" -> userService.update();
+                    case "5" -> userService.delete();
                     case "0" -> running = false;
                     default -> System.out.println("Неизвестная команда.");
                 }
