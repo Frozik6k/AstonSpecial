@@ -14,7 +14,6 @@ import java.util.Scanner;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-
     public static void main(String[] args) {
         log.info("User Service started");
         UserDao userDao = new UserDaoImpl();
