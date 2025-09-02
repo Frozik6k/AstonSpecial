@@ -1,6 +1,9 @@
 package ru.Frozik6k.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.Frozik6k.dao.UserDao;
+import ru.Frozik6k.dao.UserDaoImpl;
 import ru.Frozik6k.dto.UserDto;
 import ru.Frozik6k.model.User;
 
@@ -9,7 +12,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class UserService {
-
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserDao userDao;
     private final Scanner scanner;
 
@@ -29,6 +32,7 @@ public class UserService {
 
         User user = new User(name, email, age);
         Long id = userDao.create(user);
+        log.info("Создан пользователь с id=" + id);
         System.out.println("Создан пользователь с ID = " + id);
     }
 
