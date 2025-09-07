@@ -1,12 +1,24 @@
 package ru.Frozik6k.dao;
 
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.Frozik6k.model.User;
+import ru.Frozik6k.utility.HibernateUtilityTest;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -22,21 +34,26 @@ public class UserDaoImplTest {
     private static UserDao userDao;
 
     @BeforeAll
-    static void initAll() {
+    static void initAll() throws Exception {
         POSTGRES.start();
 
-        // Применяем миграции Flyway из classpath: db/migration
-        Flyway.configure()
-                .dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
-                .locations("classpath:db/migration")
-                .load()
-                .migrate();
+        String url = POSTGRES.getJdbcUrl();
+        String user = POSTGRES.getUsername();
+        String pass = POSTGRES.getPassword();
 
-        // Строим SessionFactory для тестовой БД из контейнера
-        sessionFactory = TestHibernateUtil.buildSessionFactory(
-                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+            Database database = DatabaseFactory.getInstance()
+                    .findCorrectDatabaseImplementation(new JdbcConnection(conn));
+            Liquibase liquibase = new Liquibase(
+                    "db/changelog/db.changelog-master.yaml",
+                    new ClassLoaderResourceAccessor(),
+                    database
+            );
+            liquibase.update((String) null);
+        }
 
-        // Подменяем поведение DAO на версию, использующую sessionFactory теста
+        sessionFactory = HibernateUtilityTest.buildSessionFactory(url, user, pass);
+
         userDao = new UserDaoImpl() {
             private final SessionFactory sf = sessionFactory;
 

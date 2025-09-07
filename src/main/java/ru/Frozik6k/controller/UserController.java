@@ -2,7 +2,6 @@ package ru.Frozik6k.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.Frozik6k.dao.UserDao;
 import ru.Frozik6k.dto.UserDto;
 import ru.Frozik6k.mapper.UserMapper;
 import ru.Frozik6k.model.User;
