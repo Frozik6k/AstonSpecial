@@ -1,10 +1,6 @@
 package ru.Frozik6k.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -37,8 +33,8 @@ public class User {
         this.age = age;
     }
 
-    public User(){}
-
+    public User() {
+    }
 
     @Override
     public String toString() {

@@ -1,11 +1,9 @@
 package ru.Frozik6k.utility;
 
-import lombok.Getter;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
 
 public class HibernateUtility {
     private static final Logger log = LoggerFactory.getLogger(HibernateUtility.class);
@@ -21,7 +19,8 @@ public class HibernateUtility {
         }
     }
 
-    public static void shutdown() { sessionFactory.close(); }
-
+    public static void shutdown() {
+        sessionFactory.close();
+    }
 
 }

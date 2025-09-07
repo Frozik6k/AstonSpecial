@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: db/changes/01-init-users.yaml
