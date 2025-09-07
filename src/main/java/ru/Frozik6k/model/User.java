@@ -1,6 +1,7 @@
 package ru.Frozik6k.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-@NoArgsConstructor
-@Getter
-@Setter
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +37,9 @@ public class User {
         this.age = age;
     }
 
+    public User(){}
+
+
     @Override
     public String toString() {
         return "User{" +
@@ -47,6 +49,42 @@ public class User {
                 ", age=" + age +
                 ", createdAt=" + createdAt +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     @Override

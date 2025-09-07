@@ -7,6 +7,7 @@ import ru.Frozik6k.dao.UserDaoImpl;
 import ru.Frozik6k.mapper.UserMapper;
 import ru.Frozik6k.mapper.UserMapperImpl;
 import ru.Frozik6k.controller.UserController;
+import ru.Frozik6k.service.UserService;
 import ru.Frozik6k.utility.HibernateUtility;
 
 import java.util.Scanner;
@@ -19,8 +20,8 @@ public class Main {
         UserDao userDao = new UserDaoImpl();
         Scanner scanner = new Scanner(System.in);
         UserMapper userMapper = new UserMapperImpl();
-
-        UserController userService = new UserController(userDao, scanner, userMapper);
+        UserService userService = new UserService(userDao, userMapper);
+        UserController userController = new UserController(scanner, userMapper, userService);
 
         boolean running = true;
         while (running) {
@@ -29,11 +30,11 @@ public class Main {
             String choice = scanner.nextLine();
             try {
                 switch (choice) {
-                    case "1" -> userService.create();
-                    case "2" -> userService.read();
-                    case "3" -> userService.readUsers();
-                    case "4" -> userService.update();
-                    case "5" -> userService.delete();
+                    case "1" -> userController.create();
+                    case "2" -> userController.read();
+                    case "3" -> userController.readUsers();
+                    case "4" -> userController.update();
+                    case "5" -> userController.delete();
                     case "0" -> running = false;
                     default -> System.out.println("Неизвестная команда.");
                 }
@@ -60,5 +61,4 @@ public class Main {
                 0. Выход
                 """);
     }
-
 }

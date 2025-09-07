@@ -17,7 +17,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Long create(User user) {
         Transaction tx = null;
-        try (Session session = HibernateUtility.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtility.sessionFactory.openSession()) {
             tx = session.beginTransaction();
             Long id = (Long) session.save(user);
             tx.commit();
@@ -32,7 +32,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(Long id) {
-        try (Session session = HibernateUtility.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtility.sessionFactory.openSession()) {
             User user = session.get(User.class, id);
             return Optional.ofNullable(user);
         } catch (HibernateException exception) {
@@ -43,7 +43,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        try (Session session = HibernateUtility.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtility.sessionFactory.openSession()) {
             return session.createQuery("from User", User.class).list();
         } catch (HibernateException exception) {
             log.error("Error fetching all users", exception);
@@ -54,7 +54,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void update(User user) {
         Transaction tx = null;
-        try (Session session = HibernateUtility.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtility.sessionFactory.openSession()) {
             tx = session.beginTransaction();
             session.merge(user);
             tx.commit();
@@ -69,7 +69,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void deleteById(Long id) {
         Transaction tx = null;
-        try (Session session = HibernateUtility.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtility.sessionFactory.openSession()) {
             tx = session.beginTransaction();
             User user = session.get(User.class, id);
             if (user != null) {

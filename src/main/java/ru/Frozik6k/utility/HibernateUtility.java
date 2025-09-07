@@ -6,10 +6,11 @@ import org.hibernate.cfg.Configuration;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+
 public class HibernateUtility {
     private static final Logger log = LoggerFactory.getLogger(HibernateUtility.class);
-    @Getter
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+
+    public static final SessionFactory sessionFactory = buildSessionFactory();
 
     private static SessionFactory buildSessionFactory() {
         try {
@@ -20,5 +21,7 @@ public class HibernateUtility {
         }
     }
 
-    public static void shutdown() { getSessionFactory().close(); }
+    public static void shutdown() { sessionFactory.close(); }
+
+
 }
