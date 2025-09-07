@@ -1,9 +1,64 @@
 package ru.Frozik6k;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.Frozik6k.dao.UserDao;
+import ru.Frozik6k.dao.UserDaoImpl;
+import ru.Frozik6k.mapper.UserMapper;
+import ru.Frozik6k.mapper.UserMapperImpl;
+import ru.Frozik6k.controller.UserController;
+import ru.Frozik6k.service.UserService;
+import ru.Frozik6k.utility.HibernateUtility;
+
+import java.util.Scanner;
+
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
+        log.info("User Service started");
+        UserDao userDao = new UserDaoImpl();
+        Scanner scanner = new Scanner(System.in);
+        UserMapper userMapper = new UserMapperImpl();
+        UserService userService = new UserService(userDao, userMapper);
+        UserController userController = new UserController(scanner, userMapper, userService);
 
-        System.out.println("Начинаем интенсивный курс Aston");
-
+        boolean running = true;
+        while (running) {
+            printMenu();
+            System.out.print("Выберите пункт меню: ");
+            String choice = scanner.nextLine();
+            try {
+                switch (choice) {
+                    case "1" -> userController.create();
+                    case "2" -> userController.read();
+                    case "3" -> userController.readUsers();
+                    case "4" -> userController.update();
+                    case "5" -> userController.delete();
+                    case "0" -> running = false;
+                    default -> System.out.println("Неизвестная команда.");
+                }
+            } catch (Exception e) {
+                System.out.println("Ошибка: " + e.getMessage());
+                log.error("Unexpected error", e);
+            }
+            System.out.println();
         }
+
+        HibernateUtility.shutdown();
+        System.out.println("Пока!");
+        log.info("User Service stopped");
     }
+
+    private static void printMenu() {
+        System.out.println("""
+                *** User Service ***
+                1. Создать пользователя
+                2. Найти пользователя по ID
+                3. Показать всех пользователей
+                4. Обновить пользователя
+                5. Удалить пользователя
+                0. Выход
+                """);
+    }
+}
