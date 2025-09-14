@@ -8,7 +8,6 @@ import ru.Frozik6k.model.User;
 import ru.Frozik6k.repository.UserRepository;
 import ru.Frozik6k.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
