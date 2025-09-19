@@ -6,5 +6,4 @@ import ru.Frozik6k.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
 }

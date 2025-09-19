@@ -1,6 +1,7 @@
 package ru.Frozik6k.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +11,18 @@ import ru.Frozik6k.service.UserService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
     private final UserService userService;
 
-    @PostMapping("/")
-    public Long addUser(@RequestBody UserDto userDto) {
-        return userService.add(userDto);
+    @PostMapping
+    public ResponseEntity addUser(@RequestBody UserDto userDto) {
+        userService.add(userDto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
@@ -27,7 +30,7 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public List<UserDto> getUsers() {
         return userService.getUsers();
     }
@@ -44,8 +47,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity delete(@PathVariable Long id) {
         userService.deleteUser(id);
-        log.info("User deleted: {}", id);
+        return ResponseEntity.ok().build();
     }
 }
