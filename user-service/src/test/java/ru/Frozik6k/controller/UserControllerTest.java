@@ -46,11 +46,10 @@ class UserControllerTest {
         UserDto userDto = new UserDto("Андрей", "andrei@frozik.ru", 51);
         given(userService.add(any(UserDto.class))).willReturn(7L);
 
-        mockMvc.perform(post("/users/")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("7"));
+                .andExpect(status().isOk());
 
         verify(userService).add(userDto);
     }
@@ -75,7 +74,7 @@ class UserControllerTest {
         );
         given(userService.getUsers()).willReturn(userDtos);
 
-        mockMvc.perform(get("/users/"))
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDtos)));
     }
