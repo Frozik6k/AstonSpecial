@@ -12,7 +12,7 @@ import ru.Frozik6k.model.kafka.UserEvent;
 @Slf4j
 public class KafkaProducerService {
 
-    private KafkaTemplate<String, UserEvent> kafkaTemplate;
+    private final KafkaTemplate<String, UserEvent> kafkaTemplate;
 
     @Value("${app.kafka.topics.user-events:user.events}")
     private String userEventsTopic;
