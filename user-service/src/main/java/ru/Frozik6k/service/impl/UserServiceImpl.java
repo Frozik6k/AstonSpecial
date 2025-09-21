@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.Frozik6k.dto.UserDto;
 import ru.Frozik6k.mapper.UserMapper;
 import ru.Frozik6k.model.User;
+import ru.Frozik6k.model.kafka.UserEvent;
+import ru.Frozik6k.model.kafka.UserOperation;
 import ru.Frozik6k.repository.UserRepository;
+import ru.Frozik6k.service.KafkaProducerService;
 import ru.Frozik6k.service.UserService;
 
 import java.util.List;
@@ -17,9 +20,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final KafkaProducerService kafkaProducerService;
 
     @Override
     public Long add(UserDto userDto) {
+        UserEvent userEvent = new UserEvent(UserOperation.CREATED, userDto.email());
+        kafkaProducerService.sendMessage(userEvent);
         return userRepository.save(
                 userMapper.toUser(userDto)
         ).getId();
@@ -55,6 +61,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow();
+        UserEvent userEvent = new UserEvent(UserOperation.DELETED, user.getEmail());
         userRepository.deleteById(id);
     }
 }
