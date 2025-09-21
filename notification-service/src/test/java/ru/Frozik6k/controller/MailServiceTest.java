@@ -76,8 +76,8 @@ public class MailServiceTest {
     void whenJsonWithCreatedSent_thenListenerReceivesUserEvent() {
         String email = "user@example.ru";
         String json = """
-      {"userOperation":"CREATED","email":"%s"}
-      """.formatted(email);
+                {"userOperation":"CREATED","email":"%s"}
+                """.formatted(email);
 
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
