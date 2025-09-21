@@ -10,9 +10,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.*;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
@@ -22,7 +20,6 @@ import ru.Frozik6k.model.kafka.UserOperation;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -62,11 +59,10 @@ public class MailServiceTest {
         try (AdminClient admin = AdminClient.create(props)) {
             try {
                 admin.createTopics(List.of(new NewTopic(TOPIC, 1, (short) 1))).all().get();
-            } catch (ExecutionException e) {
-                if (!(e.getCause() instanceof TopicExistsException)) {
-                    throw e; // остальные ошибки — пробрасываем
+            } catch (ExecutionException exception) {
+                if (!(exception.getCause() instanceof TopicExistsException)) {
+                    throw exception;
                 }
-                // если топик уже есть — ок, продолжаем
             }
         }
     }
@@ -76,31 +72,27 @@ public class MailServiceTest {
         KAFKA.stop();
     }
 
-
-
     @Test
     void whenJsonWithCreatedSent_thenListenerReceivesUserEvent() {
-        String email = "created@example.com";
+        String email = "user@example.ru";
         String json = """
       {"userOperation":"CREATED","email":"%s"}
       """.formatted(email);
 
-        // Отправляем сообщение
-        Properties p = new Properties();
-        p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
-        p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(p)) {
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        try (KafkaProducer<String, String> producer = new KafkaProducer<>(properties)) {
             producer.send(new ProducerRecord<>(TOPIC, json)); // ВАЖНО: дождаться отправки
         }
 
-        // Ждём вызов метода @KafkaListener
         Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             var captor = ArgumentCaptor.forClass(UserEvent.class);
             verify(listener, atLeastOnce()).onEvent(captor.capture());
-            UserEvent ev = captor.getValue();
-            assertThat(ev.email()).isEqualTo(email);
-            assertThat(ev.userOperation()).isEqualTo(UserOperation.CREATED);
+            UserEvent userEvent = captor.getValue();
+            assertThat(userEvent.email()).isEqualTo(email);
+            assertThat(userEvent.userOperation()).isEqualTo(UserOperation.CREATED);
         });
     }
 

@@ -1,6 +1,7 @@
 package ru.Frozik6k.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.Frozik6k.dto.UserDto;
 import ru.Frozik6k.mapper.UserMapper;
@@ -14,6 +15,7 @@ import ru.Frozik6k.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -25,7 +27,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long add(UserDto userDto) {
         UserEvent userEvent = new UserEvent(UserOperation.CREATED, userDto.email());
+        log.info("Перед отправкой в кафку");
         kafkaProducerService.sendMessage(userEvent);
+        log.info("Сообщение через кафку уже отправлено");
         return userRepository.save(
                 userMapper.toUser(userDto)
         ).getId();
