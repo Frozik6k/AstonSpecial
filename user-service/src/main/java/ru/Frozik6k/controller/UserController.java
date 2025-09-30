@@ -24,22 +24,22 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
     @Operation(summary = "Добавление нового пользователя")
+    @PostMapping
     public ResponseEntity<Void> addUser(@RequestBody UserDto userDto) {
         userService.add(userDto);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}")
     @Operation(summary = "Получить информацию о пользователя по id")
+    @GetMapping("/{id}")
     public EntityModel<UserDto> getUser(@PathVariable Long id) {
         UserDto userDto = userService.getUser(id);
         return toModel(userDto);
     }
 
-    @GetMapping
     @Operation(summary = "Получить список всех пользователей")
+    @GetMapping
     public CollectionModel<EntityModel<UserDto>> getUsers() {
         List<EntityModel<UserDto>> users = userService.getUsers().stream()
                 .map(this::toModel)
@@ -49,21 +49,22 @@ public class UserController {
                 linkTo(methodOn(UserController.class).getUsers()).withSelfRel());
     }
 
-    @PutMapping("/{id}")
     @Operation(summary = "обновить информацию о пользователе")
-    public ResponseEntity<Void> editUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    @PutMapping
+    public ResponseEntity<Void> editUser(@RequestBody UserDto userDto) {
+        userService.editUser(userDto);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
     @Operation(summary = "Удалить пользователя")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 
     private EntityModel<UserDto> toModel(UserDto userDto) {
-        Long userId = Objects.requireNonNull(userDto.id(), "User id is required to build links");
+        Long userId = Objects.requireNonNull(userDto.id(), "нет id у userDto");
 
         return EntityModel.of(userDto,
                 linkTo(methodOn(UserController.class).getUser(userId)).withSelfRel(),

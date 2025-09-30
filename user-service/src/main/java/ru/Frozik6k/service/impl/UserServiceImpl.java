@@ -54,14 +54,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editUser(Long id, UserDto userDto) throws Exception {
+    public void editUser(UserDto userDto) {
         User user = userMapper.toUser(userDto);
-        Optional<User> optionalUser = userRepository.findById(id);
+        Optional<User> optionalUser = userRepository.findById(user.getId());
         if (optionalUser.isPresent()) {
-            user.setId(id);
             userRepository.save(user);
         } else {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException(user.getId());
         }
     }
 
