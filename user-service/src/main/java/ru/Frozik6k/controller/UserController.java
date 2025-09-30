@@ -19,7 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity addUser(@RequestBody UserDto userDto) {
+    @Operation(summary = "Добавление нового пользователя")
+    public ResponseEntity<Void> addUser(@RequestBody UserDto userDto) {
         userService.add(userDto);
         return ResponseEntity.ok().build();
     }
@@ -38,13 +39,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Operation(summary = "обновить информацию о пользователе")
-    public ResponseEntity editUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        try {
-            userService.editUser(id, userDto);
-        } catch (Exception exception) {
-            log.error("Error editing user", exception);
-            return ResponseEntity.badRequest().body(exception.getMessage());
-        }
+    public ResponseEntity<Void> editUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         return ResponseEntity.ok().build();
     }
 

@@ -17,11 +17,8 @@ public class MailController {
     private final MailService mailService;
 
     @PostMapping
-    public ResponseEntity sendMailCreateAccount(@RequestBody UserEvent userEvent) {
-        switch (userEvent.userOperation()) {
-            case CREATED -> mailService.sendAccountCreated(userEvent.email());
-            case DELETED -> mailService.sendAccountDeleted(userEvent.email());
-        }
+    public ResponseEntity<Void> sendMailCreateAccount(@RequestBody UserEvent userEvent) {
+        mailService.sendAccount(userEvent);
         return ResponseEntity.ok().build();
     }
 
