@@ -40,7 +40,7 @@ import ru.Frozik6k.service.KafkaConsumerService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 public class MailServiceTest {
     protected static final String TOPIC = "user.events";
     static final DockerImageName KAFKA_IMAGE =
