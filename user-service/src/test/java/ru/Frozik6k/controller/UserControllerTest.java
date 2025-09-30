@@ -43,7 +43,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Проверяем запрос на добавление User")
     void addUserReturnsId() throws Exception {
-        UserDto userDto = new UserDto("Андрей", "andrei@frozik.ru", 51);
+        UserDto userDto = new UserDto(null, "Андрей", "andrei@frozik.ru", 51);
         given(userService.add(any(UserDto.class))).willReturn(7L);
 
         mockMvc.perform(post("/users")
@@ -57,7 +57,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Проверяем запрос на получение информации о User")
     void getUserReturnsUserDto() throws Exception {
-        UserDto userDto = new UserDto("Максим", "max@frozik.ru", 33);
+        UserDto userDto = new UserDto(null, "Максим", "max@frozik.ru", 33);
         given(userService.getUser(28L)).willReturn(userDto);
 
         mockMvc.perform(get("/users/28"))
@@ -69,8 +69,8 @@ class UserControllerTest {
     @DisplayName("Проверяем запрос на получение всех User")
     void getUsersReturnsList() throws Exception {
         List<UserDto> userDtos = List.of(
-                new UserDto("Андрей", "andrei@frozik.ru", 51),
-                new UserDto("Максим", "max@frozik.ru", 33)
+                new UserDto(null, "Андрей", "andrei@frozik.ru", 51),
+                new UserDto(null, "Максим", "max@frozik.ru", 33)
         );
         given(userService.getUsers()).willReturn(userDtos);
 
@@ -82,10 +82,10 @@ class UserControllerTest {
     @Test
     @DisplayName("Проверяем запрос на обновление данных User")
     void editUserUpdatesUser() throws Exception {
-        UserDto userDto = new UserDto("Максим", "max777@frozik6k", 34);
+        UserDto userDto = new UserDto(null, "Максим", "max777@frozik6k", 34);
         willDoNothing().given(userService).editUser(eq(28L), any(UserDto.class));
 
-        mockMvc.perform(patch("/users/28")
+        mockMvc.perform(put("/users/28")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk());
@@ -96,7 +96,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Проверяем запрос на попытку обновления данных User, если такого не существует")
     void editUser_whenServiceThrows_returnsBadRequest() throws Exception {
-        UserDto userDto = new UserDto("Максим", "max777@frozik6k", 34);
+        UserDto userDto = new UserDto(null, "Максим", "max777@frozik6k", 34);
         doThrow(new Exception("User not found")).when(userService).editUser(eq(28L), any(UserDto.class));
 
         mockMvc.perform(patch("/users/28")

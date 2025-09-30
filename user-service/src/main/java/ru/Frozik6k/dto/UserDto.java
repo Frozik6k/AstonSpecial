@@ -1,10 +1,16 @@
 package ru.Frozik6k.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserDto(
+
+        @Schema(description = "Идентификатор пользователя", accessMode = Schema.AccessMode.READ_ONLY)
+        Long id,
+
         @Schema(description = "Имя пользователя")
         @NotBlank
         String name,
