@@ -31,9 +31,9 @@ public class UserServiceImpl implements UserService {
     public Long add(UserDto userDto) {
         UserEvent userEvent = userEventMapper.toUserEvent(userDto, UserOperation.CREATED);
         long idUser = userRepository.save(userMapper.toUser(userDto)).getId();
-        log.info("Перед отправкой в кафку");
+        log.info("Перед отправкой в кафку информации о создаваемом пользователе");
         kafkaProducerService.sendMessage(userEvent);
-        log.info("Сообщение через кафку уже отправлено");
+        log.info("Сообщение через кафку уже отправлено о созданном пользователе");
         return idUser;
     }
 

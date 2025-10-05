@@ -1,73 +1,94 @@
 package ru.Frozik6k.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.Frozik6k.dto.UserDto;
-import ru.Frozik6k.service.UserService;
 
-import java.util.List;
-import java.util.Objects;
+@Tag(name = "Users", description = "API для операций над учетными записями пользователей")
+public interface UserController {
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+    @Operation(summary = "Добавление нового пользователя", tags = "addUser")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Добавление новой учетной записи пользователя",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+                            )
+                    }
+            )
+    })
+    ResponseEntity<Void> addUser(@RequestBody UserDto userDto);
 
-@Slf4j
-@RestController
-@RequestMapping("/users")
-@RequiredArgsConstructor
-public class UserController {
+    @Operation(summary = "Получить информацию о пользователя по id", tags = "getUser")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Получение информации о пользователе с индификатором id",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+                            )
+                    }
+            )
+    })
+    EntityModel<UserDto> getUser(@PathVariable Long id);
 
-    private final UserService userService;
+    @Operation(summary = "Получить список всех пользователей", tags = "getUsers")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Получение списка всех пользователей",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+                            )
+                    }
+            )
+    })
+    CollectionModel<EntityModel<UserDto>> getUsers();
 
-    @Operation(summary = "Добавление нового пользователя")
-    @PostMapping
-    public ResponseEntity<Void> addUser(@RequestBody UserDto userDto) {
-        userService.add(userDto);
-        return ResponseEntity.ok().build();
-    }
+    @Operation(summary = "обновить информацию о пользователе", tags = "editUser")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Изменение информации о пользователе",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+                            )
+                    }
+            )
+    })
+    ResponseEntity<Void> editUser(@RequestBody UserDto userDto);
 
-    @Operation(summary = "Получить информацию о пользователя по id")
-    @GetMapping("/{id}")
-    public EntityModel<UserDto> getUser(@PathVariable Long id) {
-        UserDto userDto = userService.getUser(id);
-        return toModel(userDto);
-    }
+    @Operation(summary = "Удалить пользователя", tags = "delete")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Удаляет пользователя из базы данных",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+                            )
+                    }
+            )
+    })
+    ResponseEntity<Void> delete(@PathVariable Long id);
 
-    @Operation(summary = "Получить список всех пользователей")
-    @GetMapping
-    public CollectionModel<EntityModel<UserDto>> getUsers() {
-        List<EntityModel<UserDto>> users = userService.getUsers().stream()
-                .map(this::toModel)
-                .toList();
-
-        return CollectionModel.of(users,
-                linkTo(methodOn(UserController.class).getUsers()).withSelfRel());
-    }
-
-    @Operation(summary = "обновить информацию о пользователе")
-    @PutMapping
-    public ResponseEntity<Void> editUser(@RequestBody UserDto userDto) {
-        userService.editUser(userDto);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "Удалить пользователя")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok().build();
-    }
-
-    private EntityModel<UserDto> toModel(UserDto userDto) {
-        Long userId = Objects.requireNonNull(userDto.id(), "нет id у userDto");
-
-        return EntityModel.of(userDto,
-                linkTo(methodOn(UserController.class).getUser(userId)).withSelfRel(),
-                linkTo(methodOn(UserController.class).getUsers()).withRel("users"));
-    }
 }

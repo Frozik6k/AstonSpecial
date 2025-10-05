@@ -6,10 +6,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties(prefix = "mailsend")
 @Getter
 @Setter
-public class AppProperties {
-    private String mail;
-    private String site;
+public class MailSendProperties {
+    private String created;
+    private String subject;
+    private String deleted;
+
 }
