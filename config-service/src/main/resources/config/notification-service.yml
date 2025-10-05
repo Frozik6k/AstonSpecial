@@ -1,0 +1,44 @@
+server:
+  port: 8082
+
+spring:
+  kafka:
+    consumer:
+      group-id: group_id
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: ru.Frozik6k.model.kafka
+        spring.json.value.default.type: ru.Frozik6k.model.kafka.UserEvent
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  mail:
+    host: smtp.mail.ru
+    port: 1025
+    username: name
+    password: password
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+  config:
+    import: classpath:messages-mail.yml
+
+app:
+  mail: example@mail.ru
+  site: example.ru
+  kafka:
+    topics:
+      user-events: user.events
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true

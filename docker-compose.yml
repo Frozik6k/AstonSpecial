@@ -12,36 +12,6 @@ services:
     ports:
       - "5432:5432"
 
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    networks:
-      - app-network
-    ports:
-      - "8081:8081"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      postgres:
-        condition: service_started
-      kafka:
-        condition: service_started
-
-  notification-service:
-    build: ./notification-service
-    container_name: notification-service
-    networks:
-      - app-network
-    ports:
-      - "8082:8082"
-    environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      kafka:
-        condition: service_started
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -50,8 +20,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "2181:2181"
     depends_on:
@@ -68,7 +36,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092   # имя сервиса!
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
@@ -77,31 +45,92 @@ services:
         aliases:
           - kafka
 
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_APPLICATION_NAME: api-gateway
-
-  eureka:
-    build: ./eureka-server
-    container_name: eureka
+  discovery-service:
+    build: ./discovery-service
+    container_name: discovery-service
+    networks:
+      - app-network
     ports:
       - "8761:8761"
     environment:
-      SPRING_APPLICATION_NAME: eureka-server
+      SPRING_APPLICATION_NAME: discovery-service
+      CONFIG_SERVER_URL: http://config-service:8888
 
-  config-server:
-    build: ./config-server
-    container_name: config-server
+
+  config-service:
+    build: ./config-service
+    container_name: config-service
+    networks:
+      - app-network
     ports:
       - "8888:8888"
     environment:
-      SPRING_APPLICATION_NAME: config-server
+      SPRING_APPLICATION_NAME: config-service
+      EUREKA_SERVER_URL: http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
 
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    networks:
+      - app-network
+    ports:
+      - "8081:8081"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CONFIG_SERVER_URL: http://config-service:8888
+      EUREKA_SERVER_URL: http://discovery-service:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_started
+      kafka:
+        condition: service_started
+      config-service:
+        condition: service_started
+      discovery-service:
+        condition: service_started
 
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    networks:
+      - app-network
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CONFIG_SERVER_URL: http://config-service:8888
+      EUREKA_SERVER_URL: http://discovery-service:8761/eureka/
+    depends_on:
+      kafka:
+        condition: service_started
+      config-service:
+        condition: service_started
+      discovery-service:
+        condition: service_started
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    networks:
+      - app-network
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_SERVER_URL: http://config-service:8888
+      EUREKA_SERVER_URL: http://discovery-service:8761/eureka/
+    depends_on:
+      config-service:
+        condition: service_started
+      discovery-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
 
 networks:
   app-network:
