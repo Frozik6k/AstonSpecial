@@ -1,28 +1,30 @@
 package ru.Frozik6k.controller;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import ru.Frozik6k.model.kafka.UserEvent;
-import ru.Frozik6k.service.MailService;
 
-@RestController
-@RequestMapping("/mail")
-@RequiredArgsConstructor
-public class MailController {
-
-    private final MailService mailService;
-
-    @PostMapping
-    public ResponseEntity sendMailCreateAccount(@RequestBody UserEvent userEvent) {
-        switch (userEvent.userOperation()) {
-            case CREATED -> mailService.sendAccountCreated(userEvent.email());
-            case DELETED -> mailService.sendAccountDeleted(userEvent.email());
-        }
-        return ResponseEntity.ok().build();
-    }
-
+@Tag(name = "Mail notifications", description = "API для отправки уведомплений на почту пользователя")
+public interface MailController {
+    @Operation(summary = "Отправить сообщение на почту пользователю о создании аккаунта", tags = "sendMailCreateAccount")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Отправка сообщения пользователю о создании аккаунта",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserEvent.class))
+                            )
+                    }
+            )
+    })
+    ResponseEntity<Void> sendMailCreateAccount(@RequestBody UserEvent userEvent);
 }

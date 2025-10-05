@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.Frozik6k.dto.UserDto;
+import ru.Frozik6k.exception.UserNotFoundException;
+import ru.Frozik6k.mapper.UserEventMapper;
 import ru.Frozik6k.mapper.UserMapper;
 import ru.Frozik6k.model.User;
 import ru.Frozik6k.model.kafka.UserEvent;
@@ -22,17 +24,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserEventMapper userEventMapper;
     private final KafkaProducerService kafkaProducerService;
 
     @Override
     public Long add(UserDto userDto) {
-        UserEvent userEvent = new UserEvent(UserOperation.CREATED, userDto.email());
-        log.info("Перед отправкой в кафку");
+        UserEvent userEvent = userEventMapper.toUserEvent(userDto, UserOperation.CREATED);
+        long idUser = userRepository.save(userMapper.toUser(userDto)).getId();
+        log.info("Перед отправкой в кафку информации о создаваемом пользователе");
         kafkaProducerService.sendMessage(userEvent);
-        log.info("Сообщение через кафку уже отправлено");
-        return userRepository.save(
-                userMapper.toUser(userDto)
-        ).getId();
+        log.info("Сообщение через кафку уже отправлено о созданном пользователе");
+        return idUser;
     }
 
     @Override
@@ -52,14 +54,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editUser(Long id, UserDto userDto) throws Exception {
+    public void editUser(UserDto userDto) {
         User user = userMapper.toUser(userDto);
-        Optional<User> optionalUser = userRepository.findById(id);
+        Optional<User> optionalUser = userRepository.findById(user.getId());
         if (optionalUser.isPresent()) {
-            user.setId(id);
             userRepository.save(user);
         } else {
-            throw new Exception("User not found");
+            throw new UserNotFoundException(user.getId());
         }
     }
 
@@ -68,5 +69,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow();
         UserEvent userEvent = new UserEvent(UserOperation.DELETED, user.getEmail());
         userRepository.deleteById(id);
+        log.info("Перед отправкой в кафку");
+        kafkaProducerService.sendMessage(userEvent);
+        log.info("Сообщение через кафку уже отправлено");
     }
 }

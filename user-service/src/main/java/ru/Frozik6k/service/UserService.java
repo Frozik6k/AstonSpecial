@@ -14,7 +14,7 @@ public interface UserService {
 
     List<UserDto> getUsers();
 
-    void editUser(Long id, UserDto userDto) throws Exception;
+    void editUser(UserDto userDto);
 
     void deleteUser(Long id);
 }
