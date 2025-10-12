@@ -10,7 +10,9 @@ import ru.Frozik6k.repository.UserRepository;
                 "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration," +
                 "org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration," +
                 "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration"
+                "org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration",
+        "spring.cloud.config.enabled=false",
+        "spring.cloud.discovery.enabled=false"
 })
 public class UserServiceAppTests {
 
