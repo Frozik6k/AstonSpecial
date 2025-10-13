@@ -16,9 +16,13 @@ spring:
     host: mailhog
     port: 1025
     properties:
-      mail.smtp.auth: false
-  config:
-    import: classpath:messages-mail.yml
+      mail:
+        smtp:
+          auth: false
+          starttls.enable: false
+          connectiontimeout: 3000
+          timeout: 3000
+          writetimeout: 3000
 
 app:
   mail: example@mail.ru
