@@ -55,6 +55,15 @@ services:
     environment:
       SPRING_APPLICATION_NAME: discovery-service
       CONFIG_SERVER_URL: http://config-service:8888
+    depends_on:
+      config-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL","wget -qO- http://localhost:8761/ >/dev/null 2>&1 || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
 
   config-service:
     build: ./config-service
@@ -67,8 +76,6 @@ services:
       SPRING_APPLICATION_NAME: config-service
       EUREKA_SERVER_HOST: discovery-service
       EUREKA_SERVER_PORT: 8761
-    depends_on:
-        - discovery-service
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8888/actuator/health || exit 1" ]
       interval: 5s
@@ -96,9 +103,9 @@ services:
       kafka:
         condition: service_started
       config-service:
-        condition: service_started
+        condition: service_healthy
       discovery-service:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/actuator/health || exit 1"]
       interval: 5s
@@ -124,7 +131,9 @@ services:
       config-service:
         condition: service_healthy
       discovery-service:
-        condition: service_started
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/actuator/health || exit 1"]
       interval: 5s
@@ -159,6 +168,12 @@ services:
     ports: ["8025:8025", "1025:1025"]  # UI и SMTP
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8025/ >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+      start_period: 20s
 
 networks:
   app-network:
